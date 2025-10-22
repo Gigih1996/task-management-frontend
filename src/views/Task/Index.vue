@@ -169,6 +169,24 @@ async function applyFilters() {
   await tasksStore.fetchTasks()
 }
 
+async function clearFilters() {
+  // Reset local filter values
+  searchQuery.value = ''
+  statusFilter.value = ''
+  priorityFilter.value = ''
+
+  // Reset store filters
+  tasksStore.resetFilters()
+
+  // Fetch tasks with reset filters
+  await tasksStore.fetchTasks()
+
+  // Show toast notification
+  toastType.value = 'info'
+  toastMessage.value = 'Filters cleared successfully'
+  showToast.value = true
+}
+
 async function changePage(page) {
   tasksStore.setFilters({ page })
   await tasksStore.fetchTasks()
@@ -254,40 +272,57 @@ async function handleSort(field, order) {
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Filters Card -->
       <Card class="mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- Search Input -->
-          <Input
-            v-model="searchQuery"
-            placeholder="Search tasks..."
-            icon="mdi:magnify"
-            @input="applyFilters"
-          />
+        <div class="space-y-4">
+          <!-- Filter Inputs -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Search Input -->
+            <Input
+              v-model="searchQuery"
+              placeholder="Search tasks..."
+              icon="mdi:magnify"
+              @input="applyFilters"
+            />
 
-          <!-- Status Filter -->
-          <Select
-            v-model="statusFilter"
-            :options="statusOptions"
-            placeholder="Filter by status"
-            @change="applyFilters"
-          />
+            <!-- Status Filter -->
+            <Select
+              v-model="statusFilter"
+              :options="statusOptions"
+              placeholder="Filter by status"
+              @change="applyFilters"
+            />
 
-          <!-- Priority Filter -->
-          <Select
-            v-model="priorityFilter"
-            :options="priorityOptions"
-            placeholder="Filter by priority"
-            @change="applyFilters"
-          />
+            <!-- Priority Filter -->
+            <Select
+              v-model="priorityFilter"
+              :options="priorityOptions"
+              placeholder="Filter by priority"
+              @change="applyFilters"
+            />
+          </div>
 
-          <!-- Create Button -->
-          <Button
-            variant="primary"
-            icon="mdi:plus"
-            class="w-full"
-            @click="openCreateDialog"
-          >
-            New Task
-          </Button>
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <!-- Clear Filters Button -->
+            <Button
+              variant="secondary"
+              icon="mdi:filter-remove"
+              class="w-full sm:w-auto"
+              @click="clearFilters"
+              :disabled="!searchQuery && !statusFilter && !priorityFilter"
+            >
+              Clear Filters
+            </Button>
+
+            <!-- Create Task Button -->
+            <Button
+              variant="primary"
+              icon="mdi:plus"
+              class="w-full sm:flex-1"
+              @click="openCreateDialog"
+            >
+              New Task
+            </Button>
+          </div>
         </div>
       </Card>
 
