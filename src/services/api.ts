@@ -18,6 +18,7 @@ const api: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  withCredentials: false, // Set to false for token-based auth (not cookie-based)
 })
 
 // Request interceptor to add auth token
