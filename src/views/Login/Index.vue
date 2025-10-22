@@ -126,11 +126,11 @@ async function handleLogin() {
             <div class="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 space-y-1">
               <p class="flex items-center justify-center gap-2">
                 <Icon icon="mdi:email" width="16" />
-                <span>Email: <code class="bg-white px-2 py-0.5 rounded">test@example.com</code></span>
+                <span>Email: <code class="bg-white px-2 py-0.5 rounded">admin@example.com</code></span>
               </p>
               <p class="flex items-center justify-center gap-2">
                 <Icon icon="mdi:key" width="16" />
-                <span>Password: <code class="bg-white px-2 py-0.5 rounded">password123</code></span>
+                <span>Password: <code class="bg-white px-2 py-0.5 rounded">password</code></span>
               </p>
             </div>
             <p class="text-xs text-gray-500 mt-2">

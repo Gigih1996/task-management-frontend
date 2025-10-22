@@ -21,10 +21,14 @@ const props = defineProps({
   sortOrder: {
     type: String,
     default: 'desc'
+  },
+  paginationMeta: {
+    type: Object,
+    default: null
   }
 })
 
-const emit = defineEmits(['edit', 'delete', 'sort'])
+const emit = defineEmits(['edit', 'delete', 'sort', 'page-change'])
 
 const columns = [
   { key: 'title', label: 'Title', cellClass: 'text-sm font-medium text-gray-900', sortable: true },
@@ -37,6 +41,10 @@ const columns = [
 
 function handleSort(field, order) {
   emit('sort', field, order)
+}
+
+function handlePageChange(page) {
+  emit('page-change', page)
 }
 
 function getStatusVariant(status) {
@@ -81,7 +89,10 @@ function formatStatus(status) {
     :sortable="true"
     :sort-by="sortBy"
     :sort-order="sortOrder"
+    :show-pagination="true"
+    :pagination-meta="paginationMeta"
     @sort="handleSort"
+    @page-change="handlePageChange"
     empty-message="No tasks found. Create your first task!"
   >
     <!-- Title Column -->

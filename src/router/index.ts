@@ -1,7 +1,14 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
-const routes = [
+declare module 'vue-router' {
+  interface RouteMeta {
+    requiresAuth?: boolean
+    requiresGuest?: boolean
+  }
+}
+
+const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
@@ -17,18 +24,18 @@ const routes = [
   {
     path: '/tasks',
     name: 'Tasks',
-    component: () => import('../views/Task/Index.vue'),
+    component: () => import('../views/Task/index.vue'),
     meta: { requiresAuth: true },
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {

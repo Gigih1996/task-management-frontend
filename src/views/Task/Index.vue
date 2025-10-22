@@ -187,11 +187,12 @@ async function handleSort(field, order) {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
+    <header class="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-50 transition-all duration-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
+        <!-- Desktop & Tablet Layout -->
+        <div class="hidden md:flex justify-between items-center py-4">
           <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 p-2 rounded-lg">
+            <div class="bg-indigo-600 p-2.5 rounded-lg shadow-md">
               <Icon icon="mdi:checkbox-marked-circle-outline" class="text-white" width="28" />
             </div>
             <div>
@@ -200,9 +201,9 @@ async function handleSort(field, order) {
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <Icon icon="mdi:account-circle" width="20" />
-              <span>{{ authStore.user?.email }}</span>
+            <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+              <Icon icon="mdi:account-circle" width="20" class="text-gray-600" />
+              <span class="text-sm text-gray-700 font-medium">{{ authStore.user?.email }}</span>
             </div>
             <Button
               variant="danger"
@@ -212,6 +213,38 @@ async function handleSort(field, order) {
             >
               Logout
             </Button>
+          </div>
+        </div>
+
+        <!-- Mobile Layout -->
+        <div class="md:hidden">
+          <!-- Top Row -->
+          <div class="flex justify-between items-center py-3">
+            <div class="flex items-center gap-2.5">
+              <div class="bg-indigo-600 p-2 rounded-lg shadow-md">
+                <Icon icon="mdi:checkbox-marked-circle-outline" class="text-white" width="24" />
+              </div>
+              <div>
+                <h1 class="text-lg font-bold text-gray-900">Task Management</h1>
+                <p class="text-xs text-gray-500">Manage efficiently</p>
+              </div>
+            </div>
+            <Button
+              variant="danger"
+              size="sm"
+              icon="mdi:logout"
+              @click="showLogoutDialog"
+            />
+          </div>
+
+          <!-- Bottom Row: User Info -->
+          <div class="pb-3 pt-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg">
+              <Icon icon="mdi:account-circle" width="16" class="text-gray-600" />
+              <span class="text-xs text-gray-700 font-medium truncate max-w-[200px]">
+                {{ authStore.user?.email }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -321,33 +354,12 @@ async function handleSort(field, order) {
         :loading="tasksStore.loading"
         :sort-by="tasksStore.filters.sort_by"
         :sort-order="tasksStore.filters.sort_order"
+        :pagination-meta="tasksStore.meta"
         @edit="openEditDialog"
         @delete="showDeleteDialog"
         @sort="handleSort"
+        @page-change="changePage"
       />
-
-      <!-- Pagination -->
-      <div
-        v-if="tasksStore.meta && tasksStore.meta.last_page > 1"
-        class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4"
-      >
-        <p class="text-sm text-gray-700">
-          Showing <span class="font-medium">{{ tasksStore.meta.from }}</span> to
-          <span class="font-medium">{{ tasksStore.meta.to }}</span> of
-          <span class="font-medium">{{ tasksStore.meta.total }}</span> tasks
-        </p>
-        <div class="flex gap-2">
-          <Button
-            v-for="page in tasksStore.meta.last_page"
-            :key="page"
-            :variant="page === tasksStore.meta.current_page ? 'primary' : 'outline'"
-            size="sm"
-            @click="changePage(page)"
-          >
-            {{ page }}
-          </Button>
-        </div>
-      </div>
     </main>
 
     <!-- Task Form Modal -->
