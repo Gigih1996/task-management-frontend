@@ -1,6 +1,6 @@
 # Task Management System
 
-A full-stack task management application built with Laravel (backend) and Vue.js (frontend).
+A full-stack task management application built with Express.js + MongoDB (backend) and Vue.js (frontend).
 
 ## Table of Contents
 - [Features](#features)
@@ -15,17 +15,19 @@ A full-stack task management application built with Laravel (backend) and Vue.js
 
 ## Features
 
-### Backend (Laravel API)
-- ✅ Mock authentication with token-based auth
+### Backend (Express.js + MongoDB API)
+- ✅ JWT authentication with bcrypt password hashing
 - ✅ Full CRUD operations for tasks
-- ✅ Advanced filtering (status, priority, search)
+- ✅ Advanced filtering (status, priority, search, date range)
 - ✅ Sorting (all fields, ASC/DESC)
 - ✅ Pagination with metadata
-- ✅ Input validation with custom error messages
+- ✅ Input validation with express-validator
 - ✅ Proper HTTP status codes
-- ✅ Error handling
-- ✅ Unit tests (20+ test cases)
+- ✅ Centralized error handling
+- ✅ MongoDB optimized indexes for performance
 - ✅ RESTful API design
+- ✅ Interactive Swagger documentation (OpenAPI 3.0)
+- ✅ Database seeding with Faker.js
 
 ### Frontend (Vue.js)
 - ✅ Modern Vue 3 with Composition API
@@ -41,11 +43,15 @@ A full-stack task management application built with Laravel (backend) and Vue.js
 ## Tech Stack
 
 ### Backend
-- **Framework**: Laravel 12.x
-- **Database**: SQLite (development) / MySQL/PostgreSQL (production)
-- **Authentication**: Mock token-based auth (Laravel Sanctum ready)
-- **Testing**: PHPUnit
-- **Validation**: Laravel Form Requests
+- **Runtime**: Node.js >= 18.x
+- **Framework**: Express.js 4.x
+- **Database**: MongoDB Atlas (NoSQL)
+- **ODM**: Mongoose
+- **Authentication**: JWT (jsonwebtoken) + bcryptjs
+- **Validation**: express-validator
+- **Documentation**: Swagger UI Express (OpenAPI 3.0)
+- **Seeding**: @faker-js/faker
+- **Development**: nodemon
 
 ### Frontend
 - **Framework**: Vue.js 3 (Composition API)
@@ -56,99 +62,106 @@ A full-stack task management application built with Laravel (backend) and Vue.js
 - **Styling**: Tailwind CSS
 - **UI Components**: Custom components (shadcn-vue inspired)
 
-### Database (MongoDB - for indexes reference)
-- **Purpose**: Index optimization documentation
-- **Location**: `db/indexes.js`
+### Database
+- **Type**: MongoDB Atlas (Cloud NoSQL)
+- **ODM**: Mongoose
+- **Purpose**: Scalable document-based data storage with optimized indexes
 
 ## Project Structure
 
 ```
 MileApp/
-├── backend/                 # Laravel API
-│   ├── app/
-│   │   ├── Http/
-│   │   │   ├── Controllers/
-│   │   │   │   └── Api/
-│   │   │   │       ├── AuthController.php
-│   │   │   │       └── TaskController.php
-│   │   │   ├── Middleware/
-│   │   │   │   └── MockAuthMiddleware.php
-│   │   │   └── Requests/
-│   │   │       ├── LoginRequest.php
-│   │   │       ├── StoreTaskRequest.php
-│   │   │       └── UpdateTaskRequest.php
-│   │   └── Models/
-│   │       └── Task.php
-│   ├── database/
-│   │   ├── migrations/
-│   │   └── factories/
-│   ├── routes/
-│   │   └── api.php
-│   └── tests/
-│       └── Feature/
-│           └── Api/
-│               ├── AuthTest.php
-│               └── TaskTest.php
+├── backend-express/         # Express.js + MongoDB API
+│   ├── db/
+│   │   ├── indexes.js       # MongoDB index creation script
+│   │   └── seeders/
+│   │       ├── seed.js      # Main seeder (5 users + 40 tasks)
+│   │       ├── userSeeder.js # User seeder
+│   │       └── taskSeeder.js # Task seeder
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js  # MongoDB connection
+│   │   │   └── swagger.js   # Swagger documentation config
+│   │   ├── controllers/
+│   │   │   ├── authController.js  # Authentication logic
+│   │   │   └── taskController.js  # Task CRUD operations
+│   │   ├── middleware/
+│   │   │   ├── auth.js            # JWT authentication
+│   │   │   └── errorHandler.js    # Error handling
+│   │   ├── models/
+│   │   │   ├── User.js     # User schema (Mongoose)
+│   │   │   └── Task.js     # Task schema (Mongoose)
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js  # Auth endpoints
+│   │   │   └── taskRoutes.js  # Task endpoints
+│   │   └── index.js           # Application entry point
+│   ├── .env                 # Environment variables
+│   ├── .env.example         # Environment template
+│   ├── vercel.json          # Vercel deployment config
+│   └── package.json         # Dependencies
 ├── frontend/                # Vue.js Application
 │   ├── src/
 │   │   ├── components/      # Reusable UI components
 │   │   ├── views/           # Page components
 │   │   ├── stores/          # Pinia stores
-│   │   ├── services/        # API services
+│   │   ├── services/        # API services (Axios)
 │   │   ├── router/          # Vue Router config
 │   │   └── lib/             # Utilities
-│   └── public/
-└── db/
-    └── indexes.js           # MongoDB index script
+│   ├── public/              # Static assets
+│   ├── .env                 # Environment variables
+│   └── package.json         # Dependencies
+└── backend/                 # Legacy Laravel API (deprecated)
 
 ```
 
 ## Installation
 
 ### Prerequisites
-- PHP >= 8.2
-- Composer
-- Node.js >= 22.x
+- Node.js >= 18.x
 - npm or yarn
+- MongoDB Atlas account (already configured)
 
 ### Backend Setup
 
-1. Navigate to backend directory:
+1. Navigate to backend-express directory:
 ```bash
-cd backend
+cd backend-express
 ```
 
 2. Install dependencies:
 ```bash
-composer install
+npm install
 ```
 
-3. Copy environment file:
+3. Environment is already configured in `.env`:
+```env
+NODE_ENV=development
+PORT=5001
+MONGODB_URI=mongodb+srv://gsatriono_db_user:VeRr6ckSkLFsrL2E@gigih-cluster1.n78yqmq.mongodb.net/task_manage_express
+JWT_SECRET=express_jwt_secret_key_2025_change_this_in_production
+JWT_EXPIRE=30d
+```
+
+4. Seed database with sample data (5 users + 40 tasks):
 ```bash
-cp .env.example .env
+npm run seed
 ```
 
-4. Generate application key:
+5. Create MongoDB indexes for better performance:
 ```bash
-php artisan key:generate
+npm run create:indexes
 ```
 
-5. Run migrations:
+6. Start development server:
 ```bash
-php artisan migrate
+npm run dev
 ```
 
-6. (Optional) Seed database with sample data:
-```bash
-php artisan db:seed
-```
+The API will be available at `http://localhost:5001`
 
-7. Start development server:
-```bash
-php artisan serve
-```
-
-The API will be available at `http://localhost:8000`
+**Default Login Credentials:**
+- Email: `admin@example.com`
+- Password: `password123`
 
 ### Frontend Setup
 
@@ -169,7 +182,7 @@ cp .env.example .env
 
 4. Update API URL in `.env`:
 ```
-VITE_API_URL=http://localhost:8000/api
+VITE_API_URL=http://localhost:5001/api
 ```
 
 5. Start development server:
@@ -181,20 +194,57 @@ The frontend will be available at `http://localhost:5173`
 
 ## API Documentation
 
+### Interactive Documentation (Swagger)
+Once the backend server is running, access the **interactive Swagger UI** at:
+```
+http://localhost:5001/api-docs
+```
+
 ### Base URL
 ```
-http://localhost:8000/api
+http://localhost:5001/api
 ```
 
 ### Authentication
 
-#### Login
+All authentication endpoints are under `/api/auth`
+
+#### Register
 ```http
-POST /login
+POST /auth/register
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": "6507...",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+#### Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
   "password": "password123"
 }
 ```
@@ -205,26 +255,45 @@ Content-Type: application/json
   "success": true,
   "message": "Login successful",
   "data": {
-    "token": "base64_encoded_token",
-    "token_type": "Bearer",
     "user": {
-      "email": "user@example.com",
-      "name": "user"
-    }
+      "id": "6507...",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "admin"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
 }
 ```
 
-#### Logout
+#### Get Current User
 ```http
-POST /logout
+GET /auth/me
 Authorization: Bearer {token}
 ```
 
-#### Get Current User
+#### Update Profile
 ```http
-GET /me
+PUT /auth/profile
 Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "email": "new@example.com"
+}
+```
+
+#### Update Password
+```http
+PUT /auth/password
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "currentPassword": "password123",
+  "newPassword": "newpassword456"
+}
 ```
 
 ### Tasks
@@ -233,18 +302,18 @@ All task endpoints require authentication via `Authorization: Bearer {token}` he
 
 #### Get All Tasks (with filters, sort, pagination)
 ```http
-GET /tasks?status=pending&priority=high&search=keyword&sort_by=created_at&sort_order=desc&per_page=15&page=1
+GET /tasks?status=pending&priority=high&search=keyword&sort_by=createdAt&sort_order=desc&per_page=10&page=1
 ```
 
 **Query Parameters:**
 - `status` (optional): Filter by status (pending, in_progress, completed)
 - `priority` (optional): Filter by priority (low, medium, high)
-- `search` (optional): Search in title and description
-- `due_date_from` (optional): Filter tasks from date (YYYY-MM-DD)
-- `due_date_to` (optional): Filter tasks to date (YYYY-MM-DD)
-- `sort_by` (optional): Sort field (id, title, status, priority, due_date, created_at, updated_at)
-- `sort_order` (optional): Sort direction (asc, desc)
-- `per_page` (optional): Items per page (1-100, default: 15)
+- `search` (optional): Search in title and description (full-text search)
+- `due_date_from` (optional): Filter tasks from date (ISO 8601: YYYY-MM-DDTHH:mm:ss.sssZ)
+- `due_date_to` (optional): Filter tasks to date (ISO 8601)
+- `sort_by` (optional): Sort field (title, status, priority, due_date, createdAt, updatedAt)
+- `sort_order` (optional): Sort direction (asc, desc) - default: desc
+- `per_page` (optional): Items per page (1-100, default: 10)
 - `page` (optional): Page number (default: 1)
 
 **Response (200 OK):**
@@ -253,29 +322,29 @@ GET /tasks?status=pending&priority=high&search=keyword&sort_by=created_at&sort_o
   "success": true,
   "data": [
     {
-      "id": 1,
-      "title": "Complete project",
-      "description": "Finish the task management system",
+      "_id": "6507f1d3c8b4e2a1d9c3f5a1",
+      "title": "Complete project documentation",
+      "description": "Write comprehensive API documentation with examples",
       "status": "in_progress",
       "priority": "high",
-      "due_date": "2024-12-31",
-      "created_at": "2024-01-01T00:00:00.000000Z",
-      "updated_at": "2024-01-01T00:00:00.000000Z"
+      "due_date": "2024-12-31T23:59:59.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
     }
   ],
   "meta": {
     "current_page": 1,
     "from": 1,
-    "last_page": 5,
-    "per_page": 15,
-    "to": 15,
-    "total": 75
+    "last_page": 4,
+    "per_page": 10,
+    "to": 10,
+    "total": 35
   },
   "links": {
-    "first": "http://localhost:8000/api/tasks?page=1",
-    "last": "http://localhost:8000/api/tasks?page=5",
+    "first": 1,
+    "last": 4,
     "prev": null,
-    "next": "http://localhost:8000/api/tasks?page=2"
+    "next": 2
   }
 }
 ```
@@ -291,13 +360,20 @@ POST /tasks
 Content-Type: application/json
 
 {
-  "title": "New Task",
-  "description": "Task description",
+  "title": "Implement new feature",
+  "description": "Add user authentication to the dashboard module",
   "status": "pending",
-  "priority": "medium",
-  "due_date": "2024-12-31"
+  "priority": "high",
+  "due_date": "2024-12-31T23:59:59.000Z"
 }
 ```
+
+**Validation Rules:**
+- `title`: Required, 3-200 characters
+- `description`: Required, 10-1000 characters
+- `status`: Optional, one of: pending, in_progress, completed (default: pending)
+- `priority`: Optional, one of: low, medium, high (default: medium)
+- `due_date`: Required, valid ISO 8601 date
 
 **Response (201 Created):**
 ```json
@@ -305,14 +381,14 @@ Content-Type: application/json
   "success": true,
   "message": "Task created successfully",
   "data": {
-    "id": 1,
-    "title": "New Task",
-    "description": "Task description",
+    "_id": "6507f1d3c8b4e2a1d9c3f5a1",
+    "title": "Implement new feature",
+    "description": "Add user authentication to the dashboard module",
     "status": "pending",
-    "priority": "medium",
-    "due_date": "2024-12-31",
-    "created_at": "2024-01-01T00:00:00.000000Z",
-    "updated_at": "2024-01-01T00:00:00.000000Z"
+    "priority": "high",
+    "due_date": "2024-12-31T23:59:59.000Z",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 }
 ```
@@ -343,15 +419,21 @@ DELETE /tasks/{id}
 
 ### Error Responses
 
-#### Validation Error (422 Unprocessable Entity)
+#### Validation Error (400 Bad Request)
 ```json
 {
-  "message": "The given data was invalid.",
-  "errors": {
-    "title": [
-      "The title field is required."
-    ]
-  }
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    {
+      "field": "title",
+      "message": "Title must be between 3 and 200 characters"
+    },
+    {
+      "field": "due_date",
+      "message": "Due date is required"
+    }
+  ]
 }
 ```
 
@@ -359,7 +441,7 @@ DELETE /tasks/{id}
 ```json
 {
   "success": false,
-  "message": "Unauthorized. Please provide a valid token."
+  "message": "Not authorized, token is missing or invalid"
 }
 ```
 
@@ -371,25 +453,42 @@ DELETE /tasks/{id}
 }
 ```
 
+#### Internal Server Error (500)
+```json
+{
+  "success": false,
+  "message": "Server error"
+}
+```
+
 ## Database Indexes
 
-The `db/indexes.js` file contains MongoDB index creation commands optimized for the application's query patterns.
+The `backend-express/db/indexes.js` file contains MongoDB index creation commands optimized for the application's query patterns.
 
 ### Index Strategy
 
-#### Single-Field Indexes
-1. **status**: Supports filtering by task status
-2. **priority**: Supports filtering by priority level
-3. **due_date**: Supports due date filtering and sorting
-4. **created_at**: Supports default sorting
+#### User Collection Indexes
+1. **email** (unique): Fast user lookup and prevents duplicates
+2. **role**: Supports role-based queries
+3. **isActive**: Active user filtering
+4. **createdAt**: User registration sorting
 
-#### Text Index
+#### Task Collection Indexes
+
+**Single-Field Indexes:**
+1. **status**: Supports filtering by task status (pending, in_progress, completed)
+2. **priority**: Supports filtering by priority level (low, medium, high)
+3. **due_date**: Supports due date filtering and sorting
+4. **createdAt**: Supports default chronological sorting
+5. **updatedAt**: Track recently modified tasks
+
+**Text Index:**
 - **title + description**: Full-text search with weighted relevance (title: 10, description: 5)
 
-#### Compound Indexes
+**Compound Indexes:**
 1. **status + priority**: Common filter combination
 2. **status + due_date**: Status filter with due date sorting
-3. **priority + created_at**: Priority filter with default sorting
+3. **priority + due_date**: Priority with deadline sorting
 4. **status + priority + due_date**: Complex multi-filter queries
 
 ### Why These Indexes?
@@ -398,49 +497,78 @@ The `db/indexes.js` file contains MongoDB index creation commands optimized for 
 2. **ESR Rule**: Follows Equality-Sort-Range rule for optimal performance
 3. **Minimal Overhead**: Balanced between query performance and write overhead
 4. **Real Query Patterns**: Based on actual API endpoint usage
+5. **Full-Text Search**: Enables efficient search across title and description
 
 ### Running the Index Script
 
-If using MongoDB:
+From the backend-express directory:
+```bash
+npm run create:indexes
+```
+
+Or manually with MongoDB shell:
 ```bash
 mongosh < db/indexes.js
 ```
 
-For SQL databases (MySQL/PostgreSQL), the indexes are already created in the Laravel migration file.
+The script will create all indexes automatically in the `task_manage_express` database.
 
 ## Design Decisions
 
 ### Backend Architecture
 
-#### 1. Mock Authentication
-- **Decision**: Implemented mock token-based authentication
+#### 1. Express.js with MongoDB
+- **Decision**: Used Express.js with MongoDB (via Mongoose)
 - **Rationale**:
-  - Simplifies testing and demonstration
-  - Production-ready structure (easily switch to real Laravel Sanctum)
-  - Validates request format and provides consistent responses
-  - Protects routes with middleware
+  - Fast and lightweight Node.js framework
+  - NoSQL flexibility for document-based data
+  - Excellent scalability for modern applications
+  - Native JSON support
+  - Rich ecosystem and community
 
-#### 2. Form Request Validation
-- **Decision**: Used Laravel Form Requests for validation
+#### 2. JWT Authentication
+- **Decision**: Implemented JWT (JSON Web Tokens) with bcrypt
 - **Rationale**:
-  - Separates validation logic from controllers
-  - Reusable validation rules
+  - Stateless authentication (perfect for REST APIs)
+  - Secure password hashing (10 salt rounds)
+  - Token-based authorization
+  - Easy to integrate with frontend
+  - Scalable across multiple servers
+
+#### 3. Express-Validator
+- **Decision**: Used express-validator for request validation
+- **Rationale**:
+  - Comprehensive validation rules
   - Custom error messages
-  - Clean, testable code
+  - Middleware-based approach
+  - Easy to chain validations
+  - Built on validator.js
 
-#### 3. API Resource Pattern
-- **Decision**: Direct JSON responses with consistent format
+#### 4. Mongoose ODM
+- **Decision**: Used Mongoose for MongoDB object modeling
 - **Rationale**:
-  - Simple and predictable API responses
-  - Consistent success/error structure
-  - Easy to consume on frontend
+  - Schema-based data modeling
+  - Built-in validation
+  - Middleware (pre/post hooks)
+  - Query building and population
+  - Connection pooling
 
-#### 4. Scopes in Models
-- **Decision**: Used query scopes for filtering
+#### 5. Centralized Error Handling
+- **Decision**: Middleware-based error handling
 - **Rationale**:
-  - Reusable query logic
-  - Chainable and composable
+  - Consistent error responses
+  - Proper HTTP status codes
+  - Environment-specific error details
   - Clean controller code
+
+#### 6. Swagger Documentation
+- **Decision**: Interactive API documentation with Swagger UI
+- **Rationale**:
+  - Auto-generated from JSDoc comments
+  - Interactive testing interface
+  - OpenAPI 3.0 standard
+  - Developer-friendly
+  - Always up-to-date
 
 ### Frontend Architecture
 
@@ -478,53 +606,112 @@ For SQL databases (MySQL/PostgreSQL), the indexes are already created in the Lar
 
 ### Database Design
 
-#### 1. Task Table Structure
-- **Fields**: id, title, description, status, priority, due_date, timestamps
+#### 1. MongoDB Schema Design
+- **Decision**: Document-based structure with Mongoose schemas
 - **Rationale**:
-  - Covers all business requirements
-  - Enum fields for data integrity
-  - Nullable description and due_date for flexibility
-  - Indexed fields for query performance
+  - Flexible schema for evolving requirements
+  - Embedded documents for related data
+  - Native JSON structure
+  - Easy to scale horizontally
 
-#### 2. Index Strategy
-- **Decision**: Multiple targeted indexes
+#### 2. User Schema
+- **Fields**: name, email (unique), password (hashed), role, isActive, timestamps
+- **Rationale**:
+  - Email uniqueness enforced at database level
+  - Role-based access control ready
+  - Soft delete capability with isActive flag
+  - Automatic timestamp tracking
+
+#### 3. Task Schema
+- **Fields**: title, description, status (enum), priority (enum), due_date, timestamps
+- **Rationale**:
+  - Enum validation for status and priority
+  - Required fields enforce data integrity
+  - Flexible description length
+  - ISO 8601 date format for due_date
+
+#### 4. Index Strategy
+- **Decision**: Multiple targeted indexes (single-field, compound, text)
 - **Rationale**:
   - Optimized for read-heavy workload
   - Supports all query patterns
+  - Full-text search capability
   - Minimal write overhead
-  - Follows best practices (ESR rule)
+  - Follows ESR rule (Equality-Sort-Range)
 
 ## Deployment
 
-### Backend Deployment (Laravel)
+### Backend Deployment (Express.js)
 
-#### Option 1: Traditional Hosting (Shared/VPS)
+#### Option 1: Vercel (Recommended for Serverless)
+
+1. Install Vercel CLI:
+```bash
+npm install -g vercel
+```
+
+2. Navigate to backend-express directory:
+```bash
+cd backend-express
+```
+
+3. Deploy:
+```bash
+vercel --prod
+```
+
+4. Set environment variables in Vercel Dashboard:
+```
+NODE_ENV=production
+MONGODB_URI=your_mongodb_atlas_uri
+JWT_SECRET=your_secure_jwt_secret
+JWT_EXPIRE=30d
+```
+
+**Note**: The project includes `vercel.json` configuration file.
+
+#### Option 2: Railway / Render / Heroku
+
+1. Connect GitHub repository
+2. Set build command: `npm install`
+3. Set start command: `npm start`
+4. Add environment variables
+5. Deploy automatically on push
+
+#### Option 3: Traditional Hosting (VPS)
 
 1. Upload code to server
-2. Configure `.env` for production
-3. Run migrations:
+2. Install dependencies:
 ```bash
-php artisan migrate --force
+npm install --production
 ```
-4. Optimize:
+3. Configure environment variables
+4. Use PM2 for process management:
 ```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-#### Option 2: Platform as a Service
-
-**Laravel Vapor** (AWS Lambda)
-```bash
-composer require laravel/vapor-cli
-vapor deploy production
+npm install -g pm2
+pm2 start src/index.js --name "task-api"
+pm2 startup
+pm2 save
 ```
 
-**Railway** / **Render** / **Heroku**
-- Connect GitHub repository
-- Set environment variables
-- Auto-deploy on push
+#### Option 4: Docker
+
+Create `Dockerfile`:
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 5001
+CMD ["npm", "start"]
+```
+
+Build and run:
+```bash
+docker build -t task-api .
+docker run -p 5001:5001 --env-file .env task-api
+```
 
 ### Frontend Deployment
 
@@ -554,105 +741,115 @@ npm run build
 
 #### Backend (.env)
 ```env
-APP_NAME="Task Management API"
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-api-domain.com
-
-DB_CONNECTION=mysql
-DB_HOST=your-db-host
-DB_PORT=3306
-DB_DATABASE=your_database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+NODE_ENV=production
+PORT=5001
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database_name
+JWT_SECRET=your_very_secure_random_secret_key_here
+JWT_EXPIRE=30d
 ```
+
+**Important:**
+- Use a strong, random JWT_SECRET in production
+- MongoDB URI should point to your production database
+- Enable MongoDB Atlas IP whitelist or allow all (0.0.0.0/0) for serverless
 
 #### Frontend (.env)
 ```env
-VITE_API_URL=https://your-api-domain.com/api
+VITE_API_URL=https://your-backend-api.vercel.app/api
 ```
 
 ## Testing
 
-### Backend Tests
+### Backend API Testing
 
-Run all tests:
+#### Using Swagger UI (Recommended)
+
+1. Start the development server:
 ```bash
-php artisan test
+npm run dev
 ```
 
-Run specific test file:
-```bash
-php artisan test --filter=AuthTest
-php artisan test --filter=TaskTest
+2. Open Swagger UI:
+```
+http://localhost:5001/api-docs
 ```
 
-Run with coverage:
+3. Test authentication:
+   - Click "Authorize" button
+   - Login first to get JWT token
+   - Enter token as: `Bearer YOUR_TOKEN`
+   - Test all endpoints interactively
+
+#### Using cURL
+
 ```bash
-php artisan test --coverage
+# Login
+curl -X POST http://localhost:5001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}'
+
+# Get tasks (with token)
+curl -X GET "http://localhost:5001/api/tasks?status=pending&page=1&per_page=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Create task
+curl -X POST http://localhost:5001/api/tasks \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title":"Test task from curl",
+    "description":"Testing API endpoint with curl command",
+    "status":"pending",
+    "priority":"high",
+    "due_date":"2024-12-31T23:59:59.000Z"
+  }'
 ```
 
-### Test Coverage
+#### Using Postman/Insomnia
 
-- **Auth Endpoints**: 7 test cases
-  - Login validation (valid/invalid credentials)
-  - Logout functionality
-  - User profile retrieval
-  - Authentication middleware
+Import the following endpoints:
+- **Auth**: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/auth/me`
+- **Tasks**: GET `/api/tasks`, POST `/api/tasks`, GET `/api/tasks/:id`, PUT `/api/tasks/:id`, DELETE `/api/tasks/:id`
 
-- **Task Endpoints**: 13 test cases
-  - CRUD operations
-  - Filtering (status, priority, search)
-  - Sorting
-  - Pagination
-  - Validation errors
-  - Authentication requirements
+Set Authorization header: `Bearer YOUR_JWT_TOKEN`
 
-**Total**: 20+ test cases covering all API endpoints
+### Test Database
+
+The seeded database includes:
+- **5 Users**: 1 admin + 4 regular users
+- **40 Tasks**: Various statuses, priorities, and due dates
+- **Default Password**: `password123` for all users
+- **Admin Email**: `admin@example.com`
 
 ## Live URLs
 
 ### Development
-- **Backend API**: http://localhost:8000/api
+- **Backend API**: http://localhost:5001/api
+- **Swagger Docs**: http://localhost:5001/api-docs
 - **Frontend**: http://localhost:5173
 
 ### Production
-- **Backend API**: [Your deployment URL]
-- **Frontend**: [Your deployment URL]
-- **Repository**: [Your GitHub repository URL]
+- **Backend API**: [Your Vercel deployment URL]
+- **Frontend**: [Your Vercel deployment URL]
+- **Repository**: https://github.com/your-username/task-management
 
-## API Testing
+## Quick Start Commands
 
-### Using cURL
-
+### Backend (Express.js)
 ```bash
-# Login
-curl -X POST http://localhost:8000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
-
-# Get Tasks (with token)
-curl -X GET "http://localhost:8000/api/tasks?status=pending" \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
-# Create Task
-curl -X POST http://localhost:8000/api/tasks \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"New Task","priority":"high"}'
+cd backend-express
+npm install
+npm run seed              # Seed database
+npm run create:indexes    # Create MongoDB indexes
+npm run dev               # Start dev server
 ```
 
-### Using Postman/Insomnia
-
-Import the following collection endpoints:
-- POST `/api/login`
-- POST `/api/logout`
-- GET `/api/me`
-- GET `/api/tasks`
-- POST `/api/tasks`
-- GET `/api/tasks/{id}`
-- PUT `/api/tasks/{id}`
-- DELETE `/api/tasks/{id}`
+### Frontend (Vue.js)
+```bash
+cd frontend
+npm install
+npm run dev               # Start dev server
+```
 
 ## Module Strengths
 
@@ -675,11 +872,14 @@ Import the following collection endpoints:
 - Minified production builds
 
 ### Security
+- JWT-based authentication with bcrypt password hashing (10 salt rounds)
 - Protected routes on frontend and backend
-- Input validation on all endpoints
+- Input validation on all endpoints with express-validator
 - XSS protection with Vue.js
 - CORS configuration ready
-- SQL injection protection via Eloquent ORM
+- NoSQL injection prevention via Mongoose
+- Environment variables for sensitive data
+- Token expiration and refresh strategy
 
 ### User Experience
 - Responsive design (mobile, tablet, desktop)
@@ -691,31 +891,41 @@ Import the following collection endpoints:
 ## Future Enhancements
 
 1. **Authentication**
-   - Implement real user registration
-   - Add password reset functionality
+   - Email verification
+   - Password reset functionality (forgot password)
    - OAuth integration (Google, GitHub)
+   - Two-factor authentication (2FA)
+   - Session management
 
 2. **Features**
    - Task categories/tags
-   - File attachments
-   - Task comments
-   - Subtasks
-   - Due date reminders
+   - File attachments (AWS S3/Cloudinary)
+   - Task comments and activity log
+   - Subtasks and checklists
+   - Due date reminders (email/push notifications)
    - Task sharing/collaboration
+   - Task templates
+   - Recurring tasks
 
 3. **UI/UX**
    - Dark mode toggle
    - Drag-and-drop task reordering
    - Kanban board view
    - Calendar view
-   - Advanced filters
+   - Advanced filters and saved searches
+   - Bulk operations
+   - Keyboard shortcuts
 
 4. **Technical**
-   - WebSocket for real-time updates
-   - Export tasks (PDF, CSV)
-   - API rate limiting
-   - Caching strategy
-   - Performance monitoring
+   - WebSocket for real-time updates (Socket.io)
+   - Export tasks (PDF, CSV, JSON)
+   - API rate limiting (express-rate-limit)
+   - Redis caching strategy
+   - Performance monitoring (New Relic, DataDog)
+   - Unit and integration tests (Jest, Supertest)
+   - CI/CD pipeline (GitHub Actions)
+   - API versioning
+   - GraphQL endpoint alternative
 
 ## License
 
@@ -727,4 +937,13 @@ For questions or support, please open an issue in the repository.
 
 ---
 
-**Built with** ❤️ **using Laravel and Vue.js**
+**Built with** ❤️ **using Express.js, MongoDB, and Vue.js**
+
+## Technology Stack Summary
+
+- **Backend**: Node.js + Express.js + MongoDB + Mongoose + JWT
+- **Frontend**: Vue.js 3 + Vite + Pinia + Vue Router + Tailwind CSS + Axios
+- **Database**: MongoDB Atlas (Cloud NoSQL)
+- **Authentication**: JWT (JSON Web Tokens) + bcrypt
+- **Documentation**: Swagger UI (OpenAPI 3.0)
+- **Deployment**: Vercel (Recommended)
