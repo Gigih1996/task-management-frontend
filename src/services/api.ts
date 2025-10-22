@@ -8,12 +8,14 @@ import type {
   TaskFilterParams,
   LoginCredentials,
   LoginResponse,
+  RegisterInput,
+  RegisterResponse,
   LogoutResponse,
   UserResponse,
 } from '../types'
 
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -51,14 +53,26 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  login: (credentials: LoginCredentials) =>
-    api.post<LoginResponse>('/login', credentials),
+  register: (data: RegisterInput) =>
+    api.post<RegisterResponse>('/auth/register', data),
 
-  logout: () =>
-    api.post<LogoutResponse>('/logout'),
+  login: (credentials: LoginCredentials) =>
+    api.post<LoginResponse>('/auth/login', credentials),
+
+  logout: (): Promise<{ data: LogoutResponse }> => {
+    // Client-side logout - just clear local storage
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user')
+    return Promise.resolve({
+      data: {
+        success: true,
+        message: 'Logged out successfully'
+      }
+    })
+  },
 
   getUser: () =>
-    api.get<UserResponse>('/me'),
+    api.get<UserResponse>('/auth/me'),
 }
 
 // Tasks API
@@ -66,16 +80,16 @@ export const tasksAPI = {
   getAll: (params?: TaskFilterParams) =>
     api.get<TasksListResponse>('/tasks', { params }),
 
-  getOne: (id: number) =>
+  getOne: (id: string) =>
     api.get<TaskResponse>(`/tasks/${id}`),
 
   create: (data: TaskCreateInput) =>
     api.post<TaskResponse>('/tasks', data),
 
-  update: (id: number, data: TaskUpdateInput) =>
+  update: (id: string, data: TaskUpdateInput) =>
     api.put<TaskResponse>(`/tasks/${id}`, data),
 
-  delete: (id: number) =>
+  delete: (id: string) =>
     api.delete<TaskDeleteResponse>(`/tasks/${id}`),
 }
 

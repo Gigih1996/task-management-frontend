@@ -1,19 +1,20 @@
 // Task Entity
 export interface Task {
-  id: number
+  _id: string
+  id?: string // For backward compatibility
   title: string
   description: string
   status: TaskStatus
   priority: TaskPriority
   due_date: string // ISO 8601 format
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 // Enums
 export type TaskStatus = 'pending' | 'in_progress' | 'completed'
 export type TaskPriority = 'low' | 'medium' | 'high'
-export type SortableField = 'title' | 'description' | 'status' | 'priority' | 'due_date' | 'created_at' | 'updated_at'
+export type SortableField = '_id' | 'title' | 'description' | 'status' | 'priority' | 'due_date' | 'createdAt' | 'updatedAt'
 export type SortOrder = 'asc' | 'desc'
 
 // CRUD Input Types
@@ -57,10 +58,10 @@ export interface PaginationMeta {
 }
 
 export interface PaginationLinks {
-  first: string | null
-  last: string | null
-  prev: string | null
-  next: string | null
+  first: number | null
+  last: number | null
+  prev: number | null
+  next: number | null
 }
 
 // API Response Types
@@ -73,6 +74,7 @@ export interface TasksListResponse {
 
 export interface TaskResponse {
   success: boolean
+  message?: string
   data: Task
 }
 

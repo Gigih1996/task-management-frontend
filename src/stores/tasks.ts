@@ -25,7 +25,7 @@ export const useTasksStore = defineStore('tasks', () => {
     search: '',
     due_date_from: '',
     due_date_to: '',
-    sort_by: 'created_at',
+    sort_by: 'createdAt',
     sort_order: 'desc',
     per_page: 10,
     page: 1,
@@ -52,7 +52,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  async function fetchTask(id: number) {
+  async function fetchTask(id: string) {
     loading.value = true
     error.value = null
 
@@ -82,16 +82,24 @@ export const useTasksStore = defineStore('tasks', () => {
         return { success: true, data: response.data.data }
       }
     } catch (err: any) {
-      // Handle Laravel validation errors (422)
-      if (err.response?.status === 422) {
-        const validationErrors = err.response.data.errors || {}
-        // Transform Laravel errors format { field: ['message'] } to { field: 'message' }
-        const transformedErrors: Record<string, string> = {}
-        for (const [field, messages] of Object.entries(validationErrors)) {
-          transformedErrors[field] = Array.isArray(messages) ? messages[0] : messages
+      // Handle Express validation errors (400)
+      if (err.response?.status === 400) {
+        const errorData = err.response.data
+
+        // Handle validation errors array format
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const transformedErrors: Record<string, string> = {}
+          errorData.errors.forEach((e: any) => {
+            if (e.path) {
+              transformedErrors[e.path] = e.msg || e.message
+            }
+          })
+          error.value = 'Validation failed'
+          return { success: false, error: error.value, errors: transformedErrors }
         }
-        error.value = err.response?.data?.message || 'Validation failed'
-        return { success: false, error: error.value, errors: transformedErrors }
+
+        error.value = errorData.message || 'Validation failed'
+        return { success: false, error: error.value }
       }
 
       error.value = err.response?.data?.message || 'Failed to create task'
@@ -101,7 +109,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  async function updateTask(id: number, taskData: TaskUpdateInput) {
+  async function updateTask(id: string, taskData: TaskUpdateInput) {
     loading.value = true
     error.value = null
 
@@ -113,16 +121,24 @@ export const useTasksStore = defineStore('tasks', () => {
         return { success: true, data: response.data.data }
       }
     } catch (err: any) {
-      // Handle Laravel validation errors (422)
-      if (err.response?.status === 422) {
-        const validationErrors = err.response.data.errors || {}
-        // Transform Laravel errors format { field: ['message'] } to { field: 'message' }
-        const transformedErrors: Record<string, string> = {}
-        for (const [field, messages] of Object.entries(validationErrors)) {
-          transformedErrors[field] = Array.isArray(messages) ? messages[0] : messages
+      // Handle Express validation errors (400)
+      if (err.response?.status === 400) {
+        const errorData = err.response.data
+
+        // Handle validation errors array format
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const transformedErrors: Record<string, string> = {}
+          errorData.errors.forEach((e: any) => {
+            if (e.path) {
+              transformedErrors[e.path] = e.msg || e.message
+            }
+          })
+          error.value = 'Validation failed'
+          return { success: false, error: error.value, errors: transformedErrors }
         }
-        error.value = err.response?.data?.message || 'Validation failed'
-        return { success: false, error: error.value, errors: transformedErrors }
+
+        error.value = errorData.message || 'Validation failed'
+        return { success: false, error: error.value }
       }
 
       error.value = err.response?.data?.message || 'Failed to update task'
@@ -132,7 +148,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  async function deleteTask(id: number) {
+  async function deleteTask(id: string) {
     loading.value = true
     error.value = null
 
@@ -141,7 +157,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
       if (response.data.success) {
         await fetchTasks() // Refresh the list
-        return { success: true }
+        return { success: true, message: response.data.message }
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to delete task'
@@ -162,7 +178,7 @@ export const useTasksStore = defineStore('tasks', () => {
       search: '',
       due_date_from: '',
       due_date_to: '',
-      sort_by: 'created_at',
+      sort_by: 'createdAt',
       sort_order: 'desc',
       per_page: 10,
       page: 1,

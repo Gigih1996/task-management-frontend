@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button.vue'
 import Input from '../../components/ui/Input.vue'
 import Card from '../../components/ui/Card.vue'
 import LoadingModal from '../../components/ui/LoadingModal.vue'
+import Toast from '../../components/ui/Toast.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -19,6 +20,25 @@ const form = ref({
 const errors = ref({})
 const loading = ref(false)
 const showLoadingModal = ref(false)
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'error',
+  message: ''
+})
+
+function showToast(message, type = 'error') {
+  toast.value = {
+    show: true,
+    type,
+    message
+  }
+}
+
+function closeToast() {
+  toast.value.show = false
+}
 
 async function handleLogin() {
   errors.value = {}
@@ -47,9 +67,12 @@ async function handleLogin() {
   showLoadingModal.value = false
 
   if (result.success) {
-    router.push('/tasks')
+    showToast('Login successful! Redirecting...', 'success')
+    setTimeout(() => {
+      router.push('/tasks')
+    }, 1000)
   } else {
-    errors.value.general = result.error || 'Login failed'
+    showToast(result.error || 'Login failed. Please try again.', 'error')
   }
 }
 </script>
@@ -75,15 +98,6 @@ async function handleLogin() {
       <!-- Login Card -->
       <Card>
         <form @submit.prevent="handleLogin" class="space-y-6">
-          <!-- Error Alert -->
-          <div
-            v-if="errors.general"
-            class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start gap-2"
-          >
-            <Icon icon="mdi:alert-circle" width="20" class="mt-0.5" />
-            <span class="text-sm">{{ errors.general }}</span>
-          </div>
-
           <!-- Email Input -->
           <Input
             v-model="form.email"
@@ -151,6 +165,14 @@ async function handleLogin() {
     <LoadingModal
       :show="showLoadingModal"
       message="Signing in..."
+    />
+
+    <!-- Toast Notification -->
+    <Toast
+      :show="toast.show"
+      :type="toast.type"
+      :message="toast.message"
+      @close="closeToast"
     />
   </div>
 </template>

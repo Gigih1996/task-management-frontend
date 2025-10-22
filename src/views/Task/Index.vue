@@ -98,7 +98,7 @@ async function handleTaskSubmit(taskData) {
   const isEditing = editingTask.value !== null
 
   const result = isEditing
-    ? await tasksStore.updateTask(editingTask.value.id, taskData)
+    ? await tasksStore.updateTask(editingTask.value._id || editingTask.value.id, taskData)
     : await tasksStore.createTask(taskData)
 
   showLoadingModal.value = false
@@ -141,7 +141,7 @@ async function confirmDelete() {
   showLoadingModal.value = true
   loadingMessage.value = 'Deleting task...'
 
-  const result = await tasksStore.deleteTask(taskToDelete.value.id)
+  const result = await tasksStore.deleteTask(taskToDelete.value._id || taskToDelete.value.id)
 
   showLoadingModal.value = false
   showDeleteConfirm.value = false

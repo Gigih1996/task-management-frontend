@@ -16,7 +16,7 @@ const props = defineProps({
   },
   sortBy: {
     type: String,
-    default: 'created_at'
+    default: 'createdAt'
   },
   sortOrder: {
     type: String,
