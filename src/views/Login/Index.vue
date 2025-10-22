@@ -156,7 +156,7 @@ async function handleLogin() {
 
       <!-- Footer -->
       <div class="text-center text-sm text-gray-500">
-        <p>Built with Laravel & Vue.js</p>
+        <p>Built with ExpressJS & Vue.js</p>
         <p>© 2023 Gigih Satriono</p>
       </div>
     </div>
