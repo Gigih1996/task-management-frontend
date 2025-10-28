@@ -144,7 +144,7 @@ async function handleLogin() {
               </p>
               <p class="flex items-center justify-center gap-2">
                 <Icon icon="mdi:key" width="16" />
-                <span>Password: <code class="bg-white px-2 py-0.5 rounded">password</code></span>
+                <span>Password: <code class="bg-white px-2 py-0.5 rounded">password123</code></span>
               </p>
             </div>
             <p class="text-xs text-gray-500 mt-2">
